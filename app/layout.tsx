@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import MobileQuickDock from '@/components/MobileQuickDock';
 
 export const metadata: Metadata = {
   title: 'StockMentor AI | Self-Guided Indian Stock Market Education & Research',
@@ -17,8 +18,8 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
         <Navbar />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-slate-800/80 bg-slate-950 py-8 text-center text-xs text-slate-500">
+        <main className="flex-1 pb-16 md:pb-0">{children}</main>
+        <footer className="border-t border-slate-800/80 bg-slate-950 py-8 pb-20 md:pb-8 text-center text-xs text-slate-500">
           <div className="mx-auto max-w-7xl px-4 space-y-2">
             <p className="font-medium text-slate-400">
               StockMentor AI — Independent Stock Market Education & Research Platform
@@ -33,6 +34,7 @@ export default function RootLayout({
             </p>
           </div>
         </footer>
+        <MobileQuickDock />
       </body>
     </html>
   );
