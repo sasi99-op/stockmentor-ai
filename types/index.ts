@@ -72,6 +72,22 @@ export interface PortfolioHolding {
   created_at: string;
 }
 
+export type JournalAction = 'BUY' | 'SELL' | 'HOLD' | 'WATCH';
+export type EmotionalState = 'disciplined' | 'excited' | 'fomo' | 'anxious' | 'neutral';
+
+export interface InvestmentJournalEntry {
+  id: string;
+  user_id: string;
+  symbol: string;
+  action: JournalAction;
+  price: number;
+  conviction_level: number; // 1 to 5
+  emotional_state: EmotionalState;
+  thesis_rationale: string;
+  lessons_learned?: string;
+  created_at: string;
+}
+
 export interface IMarketDataProvider {
   readonly providerName: string;
   searchSymbols(query: string): Promise<MarketSearchItem[]>;

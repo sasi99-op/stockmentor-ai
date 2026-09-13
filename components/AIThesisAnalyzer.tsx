@@ -14,8 +14,10 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
+  Printer,
 } from 'lucide-react';
 import Link from 'next/link';
+import ThesisExportModal from '@/components/ThesisExportModal';
 
 interface AIThesisAnalyzerProps {
   symbol: string;
@@ -29,6 +31,7 @@ export default function AIThesisAnalyzer({ symbol, companyName }: AIThesisAnalyz
   const [copied, setCopied] = useState(false);
   const [checkedQuestions, setCheckedQuestions] = useState<Record<number, boolean>>({});
   const [expanded, setExpanded] = useState(true);
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   const runAnalysis = async () => {
     setLoading(true);
@@ -205,6 +208,14 @@ Disclaimer: ${analysis.disclaimer}`;
               )}
             </button>
             <button
+              onClick={() => setIsExportOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-xs font-medium text-emerald-300 border border-emerald-500/30 transition-colors"
+              title="Export Printable PDF Dossier"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Export Dossier</span>
+            </button>
+            <button
               onClick={runAnalysis}
               disabled={loading}
               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-400 hover:text-slate-200 border border-slate-700 transition-colors"
@@ -368,6 +379,15 @@ Disclaimer: ${analysis.disclaimer}`;
             </Link>
           </div>
         </div>
+      )}
+
+      {/* Printable / PDF Dossier Export Modal */}
+      {analysis && (
+        <ThesisExportModal
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+          analysis={analysis}
+        />
       )}
     </div>
   );
