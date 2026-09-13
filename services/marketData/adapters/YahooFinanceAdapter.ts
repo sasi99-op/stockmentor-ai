@@ -87,13 +87,14 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
     const results: MarketSearchItem[] = [];
     const seenSymbols = new Set<string>();
 
-    // 1. Fast match against curated Indian stocks
+    // 1. Fast match against curated Indian stocks (including aliases)
     for (const item of INDIAN_STOCKS) {
-      if (
-        item.cleanSymbol.includes(q) ||
-        item.symbol.includes(q) ||
-        item.name.toUpperCase().includes(q)
-      ) {
+      const matchClean = item.cleanSymbol.includes(q);
+      const matchSym = item.symbol.includes(q);
+      const matchName = item.name.toUpperCase().includes(q);
+      const matchAlias = item.aliases?.some((a) => a.toUpperCase().includes(q));
+
+      if (matchClean || matchSym || matchName || matchAlias) {
         results.push({
           symbol: item.symbol,
           name: item.name,
@@ -103,11 +104,11 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
       }
     }
 
-    // 2. Query Yahoo Finance Search API for broader coverage
+    // 2. Query Yahoo Finance Search API for broader coverage across all 2,000+ Indian equities
     try {
       const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
         query
-      )}&quotesCount=20&newsCount=0`;
+      )}&quotesCount=30&newsCount=0`;
 
       const res = await fetch(searchUrl, {
         headers: {
@@ -143,7 +144,22 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
       console.warn('Yahoo search lookup error:', err);
     }
 
-    return results.slice(0, 15);
+    // 3. Fallback direct ticker resolution: if user typed a pure ticker code without spaces (e.g. "YESBANK" or "RVNL")
+    // and neither .NS nor .BO has been discovered, add direct NSE candidate
+    const cleanTicker = q.replace(/[^A-Z0-9]/g, '');
+    if (cleanTicker.length >= 2 && cleanTicker.length <= 15) {
+      const candidateNSE = `${cleanTicker}.NS`;
+      if (!seenSymbols.has(candidateNSE)) {
+        results.push({
+          symbol: candidateNSE,
+          name: `${cleanTicker} (NSE Direct Lookup)`,
+          exchange: 'NSE',
+        });
+        seenSymbols.add(candidateNSE);
+      }
+    }
+
+    return results.slice(0, 20);
   }
 
   /**
@@ -159,8 +175,12 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
     }
 
     const exchange: 'NSE' | 'BSE' = symbol.endsWith('.BO') ? 'BSE' : 'NSE';
+    const cleanUpper = symbol.replace('.NS', '').replace('.BO', '');
     const metadata = INDIAN_STOCKS.find(
-      (s) => s.symbol === symbol || s.cleanSymbol === symbol.replace('.NS', '').replace('.BO', '')
+      (s) =>
+        s.symbol === symbol ||
+        s.cleanSymbol === cleanUpper ||
+        s.aliases?.some((a) => a.toUpperCase() === cleanUpper)
     );
 
     // Try fetching with crumb for comprehensive fundamentals

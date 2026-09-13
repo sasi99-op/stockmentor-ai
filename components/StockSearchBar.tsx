@@ -189,29 +189,43 @@ export default function StockSearchBar({
               );
             })}
           </div>
+
+          {/* Direct jump footer for any unlisted or smallcap NSE symbol */}
+          <div className="mt-1 pt-1.5 border-t border-slate-800/80 px-2 pb-1 flex items-center justify-between text-[11px]">
+            <span className="text-slate-500">Looking for another NSE ticker?</span>
+            <button
+              type="button"
+              onClick={() => handleSelect(`${query.toUpperCase().trim().replace(/[^A-Z0-9]/g, '')}.NS`)}
+              className="text-emerald-400 font-mono font-bold hover:underline"
+            >
+              Open {query.toUpperCase().trim().replace(/[^A-Z0-9]/g, '')}.NS →
+            </button>
+          </div>
         </div>
       )}
 
-      {/* No results notice */}
+      {/* No results notice with instant direct jump */}
       {isOpen && query.trim().length >= 2 && results.length === 0 && !isLoading && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-slate-800 bg-slate-950 p-4 text-center text-xs text-slate-400 shadow-2xl">
-          No Indian listed equities found matching &quot;{query}&quot;. Try searching by ticker like{' '}
-          <button
-            type="button"
-            onClick={() => handleSelect('TCS.NS')}
-            className="text-emerald-400 hover:underline"
-          >
-            TCS
-          </button>{' '}
-          or{' '}
-          <button
-            type="button"
-            onClick={() => handleSelect('RELIANCE.NS')}
-            className="text-emerald-400 hover:underline"
-          >
-            RELIANCE
-          </button>
-          .
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-slate-800 bg-slate-950 p-4 text-center text-xs text-slate-400 shadow-2xl space-y-3">
+          <p>
+            No indexed matches for &quot;<span className="text-white font-medium">{query}</span>&quot;.
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSelect(`${query.toUpperCase().trim().replace(/[^A-Z0-9]/g, '')}.NS`)}
+              className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 font-mono text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-all"
+            >
+              Open {query.toUpperCase().trim().replace(/[^A-Z0-9]/g, '')}.NS on NSE →
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelect(`${query.toUpperCase().trim().replace(/[^A-Z0-9]/g, '')}.BO`)}
+              className="rounded-lg bg-slate-800 border border-slate-700 px-3 py-1.5 font-mono text-slate-300 text-xs font-semibold hover:bg-slate-700 transition-all"
+            >
+              Open on BSE (.BO) →
+            </button>
+          </div>
         </div>
       )}
     </div>
