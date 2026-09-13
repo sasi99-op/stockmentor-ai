@@ -14,6 +14,9 @@ const SECTORS = [
   'Automobile',
   'Consumer Goods',
   'Healthcare',
+  'Industrials & Defense',
+  'Metals & Mining',
+  'Basic Materials',
 ];
 
 export default function StocksPage() {

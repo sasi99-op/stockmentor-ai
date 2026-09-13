@@ -107,7 +107,7 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
     try {
       const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
         query
-      )}&quotesCount=10&newsCount=0`;
+      )}&quotesCount=20&newsCount=0`;
 
       const res = await fetch(searchUrl, {
         headers: {
@@ -143,7 +143,7 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
       console.warn('Yahoo search lookup error:', err);
     }
 
-    return results.slice(0, 8);
+    return results.slice(0, 15);
   }
 
   /**
