@@ -18,12 +18,36 @@ export interface MarketQuote {
   isDelayed: boolean;
   dataSourceNotice: string;
   lastUpdated?: string;
+  // Fundamental & valuation metrics
+  marketCap?: number; // in INR
+  peRatio?: number;
+  pbRatio?: number;
+  debtToEquity?: number;
+  roe?: number; // percentage
+  dividendYield?: number; // percentage
+  week52High?: number;
+  week52Low?: number;
+  dayHigh?: number;
+  dayLow?: number;
+  volume?: number;
+  sector?: string;
+  industry?: string;
+  summary?: string;
 }
 
 export interface MarketSearchItem {
   symbol: string;
   name: string;
   exchange: 'NSE' | 'BSE';
+}
+
+export interface WatchlistItem {
+  id: string;
+  user_id: string;
+  symbol: string;
+  company_name: string;
+  exchange: 'NSE' | 'BSE';
+  created_at: string;
 }
 
 export interface IMarketDataProvider {

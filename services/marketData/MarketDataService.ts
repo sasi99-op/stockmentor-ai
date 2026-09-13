@@ -1,5 +1,5 @@
 import { IMarketDataProvider, MarketQuote, MarketSearchItem } from '@/types';
-import { YahooFinanceStubAdapter } from './adapters/YahooFinanceStubAdapter';
+import { YahooFinanceAdapter } from './adapters/YahooFinanceAdapter';
 
 /**
  * MarketDataService
@@ -14,7 +14,7 @@ class MarketDataService implements IMarketDataProvider {
   private adapter: IMarketDataProvider;
 
   constructor(adapter?: IMarketDataProvider) {
-    this.adapter = adapter ?? new YahooFinanceStubAdapter();
+    this.adapter = adapter ?? new YahooFinanceAdapter();
   }
 
   public setAdapter(newAdapter: IMarketDataProvider): void {
