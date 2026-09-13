@@ -20,4 +20,9 @@ export class YahooFinanceStubAdapter implements IMarketDataProvider {
     // Phase 1 stub: Return null or empty state. No fake prices or returns fabricated.
     return null;
   }
+
+  async getHistoricalChart(_symbol: string, _range: string): Promise<import('@/types').HistoricalDataPoint[]> {
+    return [];
+  }
 }
+

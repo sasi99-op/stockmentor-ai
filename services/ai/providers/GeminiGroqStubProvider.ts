@@ -1,4 +1,4 @@
-import { AIAnalysisRequest, AIAnalysisResponse, IAIProvider } from '@/types';
+import { AIAnalysisRequest, AIAnalysisResponse, AIThesisAnalysis, IAIProvider, MarketQuote } from '@/types';
 
 /**
  * GeminiGroqStubProvider
@@ -26,4 +26,24 @@ export class GeminiGroqStubProvider implements IAIProvider {
         'StockMentor AI is strictly educational and analytical. We do not provide investment recommendations or financial advice.',
     };
   }
+
+  async analyzeStockThesis(quote: MarketQuote): Promise<AIThesisAnalysis> {
+    return {
+      symbol: quote.symbol,
+      companyName: quote.name,
+      businessSummary: quote.summary || 'Summary unavailable.',
+      valuationAssessment: 'fair',
+      valuationEvidence: 'Development stub evaluation.',
+      solvencyStatus: 'conservative',
+      solvencyEvidence: 'Development stub solvency analysis.',
+      thesisQuestions: [
+        'Is Free Cash Flow consistently positive?',
+        'Does the firm maintain pricing power?',
+      ],
+      keyRisks: ['General macroeconomic slowdown.'],
+      disclaimer:
+        'StockMentor AI is strictly educational and analytical. We do not provide investment recommendations or financial advice.',
+    };
+  }
 }
+

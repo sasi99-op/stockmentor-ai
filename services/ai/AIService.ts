@@ -1,5 +1,11 @@
-import { AIAnalysisRequest, AIAnalysisResponse, IAIProvider } from '@/types';
-import { GeminiGroqStubProvider } from './providers/GeminiGroqStubProvider';
+import {
+  AIAnalysisRequest,
+  AIAnalysisResponse,
+  AIThesisAnalysis,
+  IAIProvider,
+  MarketQuote,
+} from '@/types';
+import { GeminiProvider } from './providers/GeminiProvider';
 
 /**
  * AIService
@@ -14,7 +20,7 @@ class AIService implements IAIProvider {
   private provider: IAIProvider;
 
   constructor(provider?: IAIProvider) {
-    this.provider = provider ?? new GeminiGroqStubProvider();
+    this.provider = provider ?? new GeminiProvider();
   }
 
   public setProvider(newProvider: IAIProvider): void {
@@ -35,8 +41,13 @@ class AIService implements IAIProvider {
   public async analyzeEvidence(request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
     return this.provider.analyzeEvidence(request);
   }
+
+  public async analyzeStockThesis(quote: MarketQuote): Promise<AIThesisAnalysis> {
+    return this.provider.analyzeStockThesis(quote);
+  }
 }
 
 // Export singleton instance for app-wide use
 export const aiService = new AIService();
 export { AIService };
+

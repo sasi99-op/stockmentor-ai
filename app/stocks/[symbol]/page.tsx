@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { marketDataService } from '@/services/marketData/MarketDataService';
 import WatchlistButton from '@/components/WatchlistButton';
+import StockChart from '@/components/StockChart';
+import AIThesisAnalyzer from '@/components/AIThesisAnalyzer';
 import {
   TrendingUp,
   TrendingDown,
@@ -13,7 +15,6 @@ import {
   PieChart,
   HelpCircle,
   Lightbulb,
-  CheckCircle2,
 } from 'lucide-react';
 
 interface StockDetailPageProps {
@@ -152,6 +153,9 @@ export default async function StockDetailPage({ params }: StockDetailPageProps) 
           )}
         </div>
       </div>
+
+      {/* Interactive TradingView Lightweight Chart */}
+      <StockChart symbol={quote.symbol} companyName={quote.name} />
 
       {/* Fundamental Metrics Grid */}
       <div>
@@ -303,27 +307,8 @@ export default async function StockDetailPage({ params }: StockDetailPageProps) 
         </div>
       </div>
 
-      {/* Formulate Your Thesis Sandbox */}
-      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 sm:p-8 space-y-4">
-        <div className="flex items-start gap-3">
-          <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
-          <div className="space-y-2 text-xs text-slate-300">
-            <h3 className="text-sm font-bold text-white">
-              Formulate Your Investment Thesis for {quote.name}
-            </h3>
-            <p className="text-slate-400 leading-relaxed">
-              StockMentor AI never provides buy/sell recommendations or targets. Use this evidence checklist
-              to evaluate your own independent investment rationale:
-            </p>
-            <ul className="list-disc list-inside space-y-1.5 text-slate-300 pt-1">
-              <li>Is the company generating consistent positive Free Cash Flow (FCF)?</li>
-              <li>Does the company possess durable competitive pricing power in its industry?</li>
-              <li>How does current valuation compare to its 5-year historical median?</li>
-              <li>Are there any auditor qualifications or pledging of promoter shares?</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      {/* Interactive StockMentor AI Thesis & Balance Sheet Evidence Engine */}
+      <AIThesisAnalyzer symbol={quote.symbol} companyName={quote.name} />
 
       {/* Legal & SEBI Disclaimer */}
       <div className="flex items-start gap-2.5 rounded-xl border border-slate-800 bg-slate-950 p-4 text-xs text-slate-500">

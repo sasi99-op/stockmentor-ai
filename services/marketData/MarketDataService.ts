@@ -1,4 +1,4 @@
-import { IMarketDataProvider, MarketQuote, MarketSearchItem } from '@/types';
+import { HistoricalDataPoint, IMarketDataProvider, MarketQuote, MarketSearchItem } from '@/types';
 import { YahooFinanceAdapter } from './adapters/YahooFinanceAdapter';
 
 /**
@@ -38,8 +38,16 @@ class MarketDataService implements IMarketDataProvider {
     }
     return this.adapter.getQuote(symbol.trim());
   }
+
+  public async getHistoricalChart(symbol: string, range: string = '1mo'): Promise<HistoricalDataPoint[]> {
+    if (!symbol || symbol.trim().length === 0) {
+      return [];
+    }
+    return this.adapter.getHistoricalChart(symbol.trim(), range);
+  }
 }
 
 // Export singleton instance for app-wide use
 export const marketDataService = new MarketDataService();
 export { MarketDataService };
+

@@ -1,4 +1,4 @@
-import { IMarketDataProvider, MarketQuote, MarketSearchItem } from '@/types';
+import { HistoricalDataPoint, IMarketDataProvider, MarketQuote, MarketSearchItem } from '@/types';
 import { INDIAN_STOCKS } from '../data/indianStocks';
 
 interface YahooCrumbSession {
@@ -276,4 +276,102 @@ export class YahooFinanceAdapter implements IMarketDataProvider {
 
     return null;
   }
+
+  /**
+   * Fetch historical OHLCV chart bars
+   */
+  async getHistoricalChart(rawSymbol: string, range: string = '1mo'): Promise<HistoricalDataPoint[]> {
+    if (!rawSymbol) return [];
+
+    let symbol = rawSymbol.trim().toUpperCase();
+    if (!symbol.includes('.')) {
+      symbol = `${symbol}.NS`;
+    }
+
+    const intervalMap: Record<string, string> = {
+      '1d': '5m',
+      '5d': '15m',
+      '1mo': '1d',
+      '6mo': '1d',
+      '1y': '1d',
+      '5y': '1wk',
+      'max': '1mo',
+    };
+
+    const interval = intervalMap[range] || '1d';
+
+    try {
+      const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
+        symbol
+      )}?interval=${interval}&range=${range}`;
+
+      const res = await fetch(chartUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)',
+        },
+        next: { revalidate: range === '1d' ? 60 : 300 }, // 1m cache for intraday, 5m for historical
+      });
+
+      if (!res.ok) {
+        return [];
+      }
+
+      const data = await res.json();
+      const result = data.chart?.result?.[0];
+      if (!result || !result.timestamp || !result.indicators?.quote?.[0]) {
+        return [];
+      }
+
+      const timestamps: number[] = result.timestamp;
+      const quote = result.indicators.quote[0];
+      const isIntraday = range === '1d' || range === '5d';
+
+      const points: HistoricalDataPoint[] = [];
+      const seenTimes = new Set<string | number>();
+
+      for (let i = 0; i < timestamps.length; i++) {
+        const o = quote.open?.[i];
+        const h = quote.high?.[i];
+        const l = quote.low?.[i];
+        const c = quote.close?.[i];
+        const v = quote.volume?.[i] ?? 0;
+
+        // Skip incomplete or null candle bars
+        if (o == null || h == null || l == null || c == null) {
+          continue;
+        }
+
+        const time: string | number = isIntraday
+          ? timestamps[i]
+          : new Date(timestamps[i] * 1000).toISOString().split('T')[0];
+
+        if (seenTimes.has(time)) {
+          continue;
+        }
+        seenTimes.add(time);
+
+        points.push({
+          time,
+          open: Number(Number(o).toFixed(2)),
+          high: Number(Number(h).toFixed(2)),
+          low: Number(Number(l).toFixed(2)),
+          close: Number(Number(c).toFixed(2)),
+          volume: Math.round(v),
+        });
+      }
+
+      // Ensure chronological ordering
+      return points.sort((a, b) => {
+        if (typeof a.time === 'number' && typeof b.time === 'number') {
+          return a.time - b.time;
+        }
+        return String(a.time).localeCompare(String(b.time));
+      });
+    } catch (err) {
+      console.error('Yahoo Finance getHistoricalChart failed:', err);
+      return [];
+    }
+  }
 }
+
